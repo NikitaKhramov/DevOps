@@ -1,18 +1,25 @@
-# Find and print names of all soft-links on your VM
-find / -type l -exec ls -la '{}' \; 1>> /var/softlinks.txt 2> /dev/null
+# Create user “adminuser”
+useradd adminuser
 
-# Find and print count of block and character devices
-find / -type b -or -type c | wc -l 1>> /var/bc_count.txt 2> /dev/null
+# Set password for “adminuser”
+echo 'adminuser:secret' | sudo chpasswd
 
-# Find all folders with Sticky bit
-find / -type d -perm -1000 -exec ls -ld {} \; 1>> /var/sticky_dirs.txt 2> /dev/null
+# Create group admin
+groupadd admin
 
-# Make soft link for /etc/hostname in /tmp folder
-ln -s /etc/hostname /tmp/new_host_name
+echo '%admin ALL=(ALL:ALL) ALL' >> /etc/sudoers
 
-# Create user “testuser”
-useradd testuser
+# Grant for “adminuser” sudoer permission
+usermod -a -G admin adminuser
 
-# Create file in home directory “testuser_data” owned by “testuser”
-touch /home/testuser/testuser_data
-chown testuser:testuser /home/testuser/testuser_data
+# Create user “poweruser”
+useradd poweruser
+
+# Grant for “poweruser” permission for iptables command
+echo 'poweruser ALL=(ALL:ALL) /usr/sbin/iptables' >> /etc/sudoers
+
+# Allow “poweruser” to read home directory of “adminuser” 
+usermod -a -G adminuser poweruser
+
+# List all of files with SUID bit set
+find / -type d -perm 4000 -exec ls -ld {} \; 1>> /var/suid_files.txt 2> /dev/null
