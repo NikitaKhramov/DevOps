@@ -20,5 +20,5 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.provision "shell", path: "hometask6.sh"
+  config.vm.provision "shell", path: "lab6.sh"
 end
